@@ -38,7 +38,7 @@ public class CorsConfig {
         List<String> allowedMethods = Arrays.asList(allowedMethodsRaw.split(","));
 
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedOriginPatterns(allowedOrigins);
         configuration.setAllowedMethods(allowedMethods);
         configuration.setAllowedHeaders(List.of(allowedHeaders));
         configuration.setAllowCredentials(allowCredentials);

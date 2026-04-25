@@ -1,0 +1,169 @@
+package com.serviflow.aviso.application;
+
+import com.serviflow.aviso.application.exception.ClienteNotFoundException;
+import com.serviflow.aviso.application.input.CreateAvisoInput;
+import com.serviflow.aviso.application.output.AvisoOutput;
+import com.serviflow.aviso.domain.entity.Aviso;
+import com.serviflow.aviso.domain.port.AvisoRepository;
+import com.serviflow.aviso.domain.port.ClienteRepository;
+import com.serviflow.aviso.domain.port.CorrelativoRepository;
+import com.serviflow.aviso.domain.valueobject.AvisoId;
+import com.serviflow.aviso.domain.valueobject.DireccionServicio;
+import com.serviflow.aviso.domain.valueobject.EstadoAviso;
+import com.serviflow.aviso.domain.valueobject.NumeroCorrelativo;
+import com.serviflow.aviso.domain.valueobject.Prioridad;
+import com.serviflow.cliente.domain.valueobject.ClienteId;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+/**
+ * Unit tests for CreateAvisoUseCase.
+ */
+@ExtendWith(MockitoExtension.class)
+class CreateAvisoUseCaseTest {
+
+    @Mock
+    private AvisoRepository avisoRepository;
+
+    @Mock
+    private ClienteRepository clienteRepository;
+
+    @Mock
+    private CorrelativoRepository correlativoRepository;
+
+    private CreateAvisoUseCase useCase;
+
+    @BeforeEach
+    void setUp() {
+        useCase = new CreateAvisoUseCase(avisoRepository, clienteRepository, correlativoRepository);
+    }
+
+    @Test
+    void execute_shouldCreateAviso_whenClienteExists() {
+        // Arrange
+        Long clienteId = 1L;
+        when(clienteRepository.existsById(new ClienteId(clienteId))).thenReturn(true);
+        when(correlativoRepository.getNextSequence(anyInt())).thenReturn(1);
+
+        NumeroCorrelativo correlativo = NumeroCorrelativo.generate(2026, 1);
+        DireccionServicio direccion = new DireccionServicio(
+            "Calle Falsa", "123", "Madrid", "Madrid", "28001"
+        );
+        LocalDateTime fechaProgramada = LocalDateTime.now().plusDays(1);
+
+        // Mock save to return the saved aviso with an ID (simulating DB-generated ID)
+        when(avisoRepository.save(any(Aviso.class))).thenAnswer(invocation -> {
+            Aviso saved = invocation.getArgument(0);
+            return Aviso.reconstitute(
+                new AvisoId(1L),
+                saved.clienteId(),
+                saved.numeroCorrelativo(),
+                saved.descripcion(),
+                saved.prioridad(),
+                saved.estado(),
+                saved.direccionServicio(),
+                saved.fechaCreacion(),
+                saved.fechaProgramada(),
+                saved.tecnicoId(),
+                saved.fechaInicio(),
+                saved.fechaFin(),
+                saved.observaciones()
+            );
+        });
+
+        CreateAvisoInput input = new CreateAvisoInput(
+            clienteId,
+            "Test description",
+            "ALTA",
+            "Calle Falsa",
+            "123",
+            "Madrid",
+            "Madrid",
+            "28001",
+            fechaProgramada,
+            "test-user"
+        );
+
+        // Act
+        AvisoOutput result = useCase.execute(input);
+
+        // Assert
+        assertThat(result).isNotNull();
+        assertThat(result.clienteId()).isEqualTo(clienteId);
+        assertThat(result.descripcion()).isEqualTo("Test description");
+        assertThat(result.prioridad()).isEqualTo("ALTA");
+        assertThat(result.estado()).isEqualTo("NUEVO");
+
+        verify(clienteRepository).existsById(new ClienteId(clienteId));
+        verify(correlativoRepository).getNextSequence(2026);
+        verify(avisoRepository).save(any(Aviso.class));
+    }
+
+    @Test
+    void execute_shouldThrowClienteNotFoundException_whenClienteDoesNotExist() {
+        // Arrange
+        Long clienteId = 999L;
+        when(clienteRepository.existsById(new ClienteId(clienteId))).thenReturn(false);
+
+        CreateAvisoInput input = new CreateAvisoInput(
+            clienteId,
+            "Test description",
+            "ALTA",
+            "Calle Falsa",
+            "123",
+            "Madrid",
+            "Madrid",
+            "28001",
+            LocalDateTime.now().plusDays(1),
+            "test-user"
+        );
+
+        // Act & Assert
+        assertThatThrownBy(() -> useCase.execute(input))
+            .isInstanceOf(ClienteNotFoundException.class)
+            .hasMessageContaining("Cliente not found with id: " + clienteId);
+
+        verify(clienteRepository).existsById(new ClienteId(clienteId));
+        verify(correlativoRepository, org.mockito.Mockito.never()).getNextSequence(anyInt());
+        verify(avisoRepository, org.mockito.Mockito.never()).save(any(Aviso.class));
+    }
+
+    @Test
+    void execute_shouldThrowException_whenDescripcionIsNull() {
+        // Arrange
+        Long clienteId = 1L;
+        when(clienteRepository.existsById(new ClienteId(clienteId))).thenReturn(true);
+        when(correlativoRepository.getNextSequence(anyInt())).thenReturn(1);
+
+        CreateAvisoInput input = new CreateAvisoInput(
+            clienteId,
+            null, // null description
+            "ALTA",
+            "Calle Falsa",
+            "123",
+            "Madrid",
+            "Madrid",
+            "28001",
+            LocalDateTime.now().plusDays(1),
+            "test-user"
+        );
+
+        // Act & Assert - Domain validation should throw
+        assertThatThrownBy(() -> useCase.execute(input))
+            .hasMessageContaining("Descripcion cannot be null");
+    }
+}

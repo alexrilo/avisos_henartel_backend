@@ -1,0 +1,29 @@
+2026-04-25T18:29:35.726+02:00 DEBUG 18536 --- [serviflow-backend] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        jue1_0.id,
+        jue1_0.activo,
+        jue1_0.apellido,
+        jue1_0.created_at,
+        jue1_0.created_by,
+        jue1_0.email,
+        jue1_0.nombre,
+        jue1_0.password,
+        jue1_0.rol_id,
+        jue1_0.updated_at,
+        jue1_0.username 
+    from
+        usuarios jue1_0 
+    where
+        jue1_0.email=?
+2026-04-25T18:29:35.729+02:00 DEBUG 18536 --- [serviflow-backend] [nio-8080-exec-8] org.hibernate.SQL                        : 
+    select
+        jre1_0.id,
+        jre1_0.created_at,
+        jre1_0.descripcion,
+        jre1_0.nombre 
+    from
+        roles jre1_0 
+    where
+        jre1_0.id=?
+2026-04-25T18:29:35.731+02:00  WARN 18536 --- [serviflow-backend] [nio-8080-exec-8] o.s.s.c.bcrypt.BCryptPasswordEncoder     : Encoded password does not look like BCrypt
+2026-04-25T18:29:35.731+02:00  WARN 18536 --- [serviflow-backend] [nio-8080-exec-8] c.s.s.i.web.GlobalExceptionHandler       : Invalid credentials: Invalid credentials

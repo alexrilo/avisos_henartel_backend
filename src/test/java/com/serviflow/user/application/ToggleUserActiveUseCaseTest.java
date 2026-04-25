@@ -1,0 +1,136 @@
+package com.serviflow.user.application;
+
+import com.serviflow.user.application.output.UserOutput;
+import com.serviflow.user.domain.entity.Role;
+import com.serviflow.user.domain.entity.User;
+import com.serviflow.user.domain.exception.UserNotFoundException;
+import com.serviflow.user.domain.port.UserRepository;
+import com.serviflow.user.domain.valueobject.Email;
+import com.serviflow.user.domain.valueobject.UserId;
+import com.serviflow.user.domain.valueobject.UserStatus;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+@DisplayName("ToggleUserActiveUseCase")
+class ToggleUserActiveUseCaseTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    private ToggleUserActiveUseCase toggleUserActiveUseCase;
+
+    @BeforeEach
+    void setUp() {
+        toggleUserActiveUseCase = new ToggleUserActiveUseCase(userRepository);
+    }
+
+    @Nested
+    @DisplayName("execute")
+    class Execute {
+
+        @Test
+        @DisplayName("should toggle active user to inactive")
+        void shouldToggleActiveToInactive() {
+            // Given
+            Long userId = 1L;
+            User activeUser = User.reconstitute(
+                new UserId(userId),
+                "testuser",
+                "hashedPassword",
+                "John",
+                "Doe",
+                new Email("john@example.com"),
+                Role.ADMINISTRADOR,
+                UserStatus.ACTIVE,
+                LocalDateTime.now()
+            );
+            when(userRepository.findById(new UserId(userId))).thenReturn(Optional.of(activeUser));
+
+            User inactiveUser = User.reconstitute(
+                new UserId(userId),
+                "testuser",
+                "hashedPassword",
+                "John",
+                "Doe",
+                new Email("john@example.com"),
+                Role.ADMINISTRADOR,
+                UserStatus.INACTIVE,
+                LocalDateTime.now()
+            );
+            when(userRepository.save(any(User.class))).thenReturn(inactiveUser);
+
+            // When
+            UserOutput result = toggleUserActiveUseCase.execute(userId);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.status()).isEqualTo("INACTIVE");
+        }
+
+        @Test
+        @DisplayName("should toggle inactive user to active")
+        void shouldToggleInactiveToActive() {
+            // Given
+            Long userId = 1L;
+            User inactiveUser = User.reconstitute(
+                new UserId(userId),
+                "testuser",
+                "hashedPassword",
+                "John",
+                "Doe",
+                new Email("john@example.com"),
+                Role.ADMINISTRADOR,
+                UserStatus.INACTIVE,
+                LocalDateTime.now()
+            );
+            when(userRepository.findById(new UserId(userId))).thenReturn(Optional.of(inactiveUser));
+
+            User activeUser = User.reconstitute(
+                new UserId(userId),
+                "testuser",
+                "hashedPassword",
+                "John",
+                "Doe",
+                new Email("john@example.com"),
+                Role.ADMINISTRADOR,
+                UserStatus.ACTIVE,
+                LocalDateTime.now()
+            );
+            when(userRepository.save(any(User.class))).thenReturn(activeUser);
+
+            // When
+            UserOutput result = toggleUserActiveUseCase.execute(userId);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.status()).isEqualTo("ACTIVE");
+        }
+
+        @Test
+        @DisplayName("should throw UserNotFoundException when user does not exist")
+        void shouldThrowUserNotFoundException() {
+            // Given
+            Long userId = 999L;
+            when(userRepository.findById(new UserId(userId))).thenReturn(Optional.empty());
+
+            // When/Then
+            assertThatThrownBy(() -> toggleUserActiveUseCase.execute(userId))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessageContaining("999");
+        }
+    }
+}

@@ -1,0 +1,12 @@
+# Production profile - overrides application.yml defaults
+
+# CORS - allow all origins in production (frontend is on Vercel)
+cors:
+  allowed-origins: "*"
+
+# Logging - less verbose in production
+logging:
+  level:
+    com.serviflow: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN

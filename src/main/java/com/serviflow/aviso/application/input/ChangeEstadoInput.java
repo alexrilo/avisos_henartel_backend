@@ -8,5 +8,6 @@ public record ChangeEstadoInput(
     String estado,
     Long tecnicoId,
     String usuario,
-    String observacion
+    String observacion,
+    String materialesUsados
 ) {}

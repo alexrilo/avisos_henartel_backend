@@ -62,6 +62,9 @@ public class JpaAvisoEntity {
     @Column(name = "fecha_fin")
     private LocalDateTime fechaFin;
 
+    @Column(name = "materiales_usados", length = 1000)
+    private String materialesUsados;
+
     @OneToMany(mappedBy = "aviso", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<JpaObservacionEntity> observaciones = new ArrayList<>();
 
@@ -196,6 +199,14 @@ public class JpaAvisoEntity {
 
     public void setFechaFin(LocalDateTime fechaFin) {
         this.fechaFin = fechaFin;
+    }
+
+    public String getMaterialesUsados() {
+        return materialesUsados;
+    }
+
+    public void setMaterialesUsados(String materialesUsados) {
+        this.materialesUsados = materialesUsados;
     }
 
     public List<JpaObservacionEntity> getObservaciones() {

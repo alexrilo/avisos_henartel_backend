@@ -70,7 +70,8 @@ public class CreateAvisoUseCase {
             input.descripcion(),
             prioridad,
             direccion,
-            input.fechaProgramada()
+            input.fechaProgramada(),
+            input.materialesUsados()
         );
 
         // Note: Initial observations are added after the aviso is saved and gets an ID from the database.

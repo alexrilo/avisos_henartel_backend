@@ -45,7 +45,9 @@ public class ChangeEstadoUseCase {
                 }
             }
             case EN_CURSO -> aviso.startWork(input.usuario());
-            case COMPLETADO -> aviso.completeWork(input.usuario());
+            case COMPLETADO -> {
+                aviso.completeWork(input.materialesUsados(), input.usuario());
+            }
             case PENDIENTE_SEGUIMIENTO -> aviso.pendingFollowUp(input.usuario());
             case CANCELADO -> aviso.cancel(input.usuario());
             default -> throw new IllegalArgumentException("Cannot transition to " + target + " directly");

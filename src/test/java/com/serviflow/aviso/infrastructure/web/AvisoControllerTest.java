@@ -71,7 +71,7 @@ class AvisoControllerTest {
         DireccionOutput direccion = new DireccionOutput("Calle Falsa", "123", "Madrid", "Madrid", "28001");
         AvisoOutput output = new AvisoOutput(
             1L, "AVI-2026-0001", 1L, null, null, null, "Test description",
-            "MEDIA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, List.of()
+            "MEDIA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, null, List.of()
         );
         when(createAvisoUseCase.execute(any())).thenReturn(output);
 
@@ -88,7 +88,8 @@ class AvisoControllerTest {
                         "numero": "123",
                         "localidad": "Madrid",
                         "provincia": "Madrid",
-                        "codigoPostal": "28001"
+                        "codigoPostal": "28001",
+                        "materialesUsados": "Cinta aislante"
                     }
                     """))
             .andExpect(status().isCreated())
@@ -119,7 +120,7 @@ class AvisoControllerTest {
         DireccionOutput direccion = new DireccionOutput("Calle Falsa", "123", "Madrid", "Madrid", "28001");
         AvisoOutput output = new AvisoOutput(
             1L, "AVI-2026-0001", 1L, null, null, null, "Test description",
-            "MEDIA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, List.of()
+            "MEDIA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, "Cables y conectores", List.of()
         );
         when(getAvisoUseCase.execute(any(Long.class), any())).thenReturn(output);
 
@@ -127,7 +128,8 @@ class AvisoControllerTest {
         mockMvc.perform(get("/api/avisos/1"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.numeroCorrelativo").value("AVI-2026-0001"));
+            .andExpect(jsonPath("$.numeroCorrelativo").value("AVI-2026-0001"))
+            .andExpect(jsonPath("$.materialesUsados").value("Cables y conectores"));
     }
 
     @Test
@@ -137,7 +139,7 @@ class AvisoControllerTest {
         DireccionOutput direccion = new DireccionOutput("Nueva Calle", "456", "Barcelona", "Barcelona", "08001");
         AvisoOutput output = new AvisoOutput(
             1L, "AVI-2026-0001", 1L, null, null, null, "Updated description",
-            "ALTA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, List.of()
+            "ALTA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, null, List.of()
         );
         when(updateAvisoUseCase.execute(any())).thenReturn(output);
 
@@ -181,7 +183,7 @@ class AvisoControllerTest {
         DireccionOutput direccion = new DireccionOutput("Calle Falsa", "123", "Madrid", "Madrid", "28001");
         AvisoOutput output = new AvisoOutput(
             1L, "AVI-2026-0001", 1L, null, null, null, "Test description",
-            "MEDIA", "ASIGNADO", direccion, LocalDateTime.now(), null, 1L, null, null, List.of()
+            "MEDIA", "ASIGNADO", direccion, LocalDateTime.now(), null, 1L, null, null, null, List.of()
         );
         when(changeEstadoUseCase.execute(any())).thenReturn(output);
 
@@ -192,7 +194,8 @@ class AvisoControllerTest {
                 .content("""
                     {
                         "estado": "ASIGNADO",
-                        "tecnicoId": 1
+                        "tecnicoId": 1,
+                        "materialesUsados": "Cables y conectores"
                     }
                     """))
             .andExpect(status().isOk())
@@ -207,7 +210,7 @@ class AvisoControllerTest {
         LocalDateTime newDate = LocalDateTime.now().plusDays(1);
         AvisoOutput output = new AvisoOutput(
             1L, "AVI-2026-0001", 1L, null, null, null, "Test description",
-            "MEDIA", "ASIGNADO", direccion, LocalDateTime.now(), null, 1L, null, null, List.of()
+            "MEDIA", "ASIGNADO", direccion, LocalDateTime.now(), null, 1L, null, null, null, List.of()
         );
         when(reprogramarAvisoUseCase.execute(any())).thenReturn(output);
 
@@ -231,7 +234,7 @@ class AvisoControllerTest {
         DireccionOutput direccion = new DireccionOutput("Calle Falsa", "123", "Madrid", "Madrid", "28001");
         AvisoOutput output = new AvisoOutput(
             1L, "AVI-2026-0001", 1L, null, null, null, "Test description",
-            "MEDIA", "CANCELADO", direccion, LocalDateTime.now(), null, null, null, null, List.of()
+            "MEDIA", "CANCELADO", direccion, LocalDateTime.now(), null, null, null, null, null, List.of()
         );
         when(cancelarAvisoUseCase.execute(any(Long.class), any())).thenReturn(output);
 

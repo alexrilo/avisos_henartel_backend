@@ -95,6 +95,7 @@ public class AvisoController {
             request.provincia(),
             request.codigoPostal(),
             request.fechaProgramada(),
+            request.materialesUsados(),
             getUsername(auth)
         );
         AvisoOutput output = createAvisoUseCase.execute(input);
@@ -162,6 +163,7 @@ public class AvisoController {
             request.provincia(),
             request.codigoPostal(),
             request.fechaProgramada(),
+            request.materialesUsados(),
             getUsername(auth)
         );
         AvisoOutput output = updateAvisoUseCase.execute(input);
@@ -207,7 +209,8 @@ public class AvisoController {
             request.estado(),
             effectiveTecnicoId,
             getUsername(auth),
-            request.observacion()
+            request.observacion(),
+            request.materialesUsados()
         );
         AvisoOutput output = changeEstadoUseCase.execute(input);
         return ResponseEntity.ok(output);
@@ -278,7 +281,8 @@ public class AvisoController {
         String localidad,
         String provincia,
         String codigoPostal,
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaProgramada
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaProgramada,
+        String materialesUsados
     ) {}
 
     /**
@@ -292,7 +296,8 @@ public class AvisoController {
         String localidad,
         String provincia,
         String codigoPostal,
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaProgramada
+        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaProgramada,
+        String materialesUsados
     ) {}
 
     /**
@@ -303,7 +308,7 @@ public class AvisoController {
     /**
      * Request body for changing estado.
      */
-    public record ChangeEstadoRequest(String estado, Long tecnicoId, String observacion) {}
+    public record ChangeEstadoRequest(String estado, Long tecnicoId, String observacion, String materialesUsados) {}
 
     /**
      * Request body for rescheduling.

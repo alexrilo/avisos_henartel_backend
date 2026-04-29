@@ -24,6 +24,7 @@ public record AvisoOutput(
     Long tecnicoId,
     LocalDateTime fechaInicio,
     LocalDateTime fechaFin,
+    String materialesUsados,
     List<ObservacionOutput> observaciones
 ) {
     /**
@@ -61,6 +62,7 @@ public record AvisoOutput(
             aviso.tecnicoId(),
             aviso.fechaInicio(),
             aviso.fechaFin(),
+            aviso.materialesUsados(),
             aviso.observaciones().stream()
                 .map(ObservacionOutput::from)
                 .toList()

@@ -15,5 +15,6 @@ public record CreateAvisoInput(
     String provincia,
     String codigoPostal,
     LocalDateTime fechaProgramada,
+    String materialesUsados,
     String usuario
 ) {}

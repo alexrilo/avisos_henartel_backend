@@ -1,0 +1,49 @@
+-------------------------------------------------------------------------------
+Test set: com.serviflow.aviso.infrastructure.web.AvisoControllerIT
+-------------------------------------------------------------------------------
+Tests run: 10, Failures: 4, Errors: 0, Skipped: 0, Time elapsed: 8.698 s <<< FAILURE! -- in com.serviflow.aviso.infrastructure.web.AvisoControllerIT
+com.serviflow.aviso.infrastructure.web.AvisoControllerIT.shouldRejectInvalidCreateRequest -- Time elapsed: 0.012 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<400> but was:<201>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.serviflow.aviso.infrastructure.web.AvisoControllerIT.shouldRejectInvalidCreateRequest(AvisoControllerIT.java:214)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.serviflow.aviso.infrastructure.web.AvisoControllerIT.shouldRejectInvalidPrioridad -- Time elapsed: 0.008 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<400> but was:<201>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.serviflow.aviso.infrastructure.web.AvisoControllerIT.shouldRejectInvalidPrioridad(AvisoControllerIT.java:236)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.serviflow.aviso.infrastructure.web.AvisoControllerIT.shouldAllowTecnicoToList -- Time elapsed: 0.015 s <<< FAILURE!
+java.lang.AssertionError: Status expected:<200> but was:<403>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.serviflow.aviso.infrastructure.web.AvisoControllerIT.shouldAllowTecnicoToList(AvisoControllerIT.java:196)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+com.serviflow.aviso.infrastructure.web.AvisoControllerIT.shouldListAvisosWithPagination -- Time elapsed: 0.007 s <<< FAILURE!
+java.lang.AssertionError: JSON path "$.currentPage" expected:<1> but was:<0>
+	at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+	at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+	at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:123)
+	at org.springframework.test.web.servlet.result.JsonPathResultMatchers.lambda$value$2(JsonPathResultMatchers.java:111)
+	at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+	at com.serviflow.aviso.infrastructure.web.AvisoControllerIT.shouldListAvisosWithPagination(AvisoControllerIT.java:153)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+

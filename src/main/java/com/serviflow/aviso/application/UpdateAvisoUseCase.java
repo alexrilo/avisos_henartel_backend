@@ -63,7 +63,8 @@ public class UpdateAvisoUseCase {
         String descripcion = input.descripcion() != null ? input.descripcion() : aviso.descripcion();
         LocalDateTime fechaProgramada = input.fechaProgramada() != null ? input.fechaProgramada() : aviso.fechaProgramada();
         
-        Aviso updated = aviso.updateInfo(descripcion, prioridad, direccion, fechaProgramada);
+        String materialesUsados = input.materialesUsados() != null ? input.materialesUsados() : aviso.materialesUsados();
+        Aviso updated = aviso.updateInfo(descripcion, prioridad, direccion, fechaProgramada, materialesUsados);
         
         // Add observation for audit trail
         updated.addObservacion("Aviso actualizado: información modificada", "ACTUALIZACION", input.usuario());

@@ -49,7 +49,7 @@ class AvisoControllerIT {
         DireccionOutput direccion = new DireccionOutput("Calle Falsa", "123", "Madrid", "Madrid", "28001");
         AvisoOutput output = new AvisoOutput(
             1L, "AVI-2026-0001", 1L, null, null, null, "Test description",
-            "ALTA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, List.of()
+            "ALTA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, null, List.of()
         );
         when(createAvisoUseCase.execute(any())).thenReturn(output);
 
@@ -66,7 +66,8 @@ class AvisoControllerIT {
                         "numero": "123",
                         "localidad": "Madrid",
                         "provincia": "Madrid",
-                        "codigoPostal": "28001"
+                        "codigoPostal": "28001",
+                        "materialesUsados": "Conectores"
                     }
                     """))
             .andExpect(status().isCreated())
@@ -85,7 +86,7 @@ class AvisoControllerIT {
         LocalDateTime fechaProgramada = LocalDateTime.of(2026, 4, 20, 10, 0);
         AvisoOutput output = new AvisoOutput(
             2L, "AVI-2026-0002", 2L, null, null, null, "Test with date",
-            "MEDIA", "NUEVO", direccion, LocalDateTime.now(), fechaProgramada, null, null, null, List.of()
+            "MEDIA", "NUEVO", direccion, LocalDateTime.now(), fechaProgramada, null, null, null, null, List.of()
         );
         when(createAvisoUseCase.execute(any())).thenReturn(output);
 
@@ -118,7 +119,7 @@ class AvisoControllerIT {
         DireccionOutput direccion = new DireccionOutput("Calle Falsa", "123", "Madrid", "Madrid", "28001");
         AvisoOutput aviso = new AvisoOutput(
             1L, "AVI-2026-0001", 1L, null, null, null, "Test description",
-            "ALTA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, List.of()
+            "ALTA", "NUEVO", direccion, LocalDateTime.now(), null, null, null, null, null, List.of()
         );
         PaginatedResponse<AvisoOutput> response = new PaginatedResponse<>(
             List.of(aviso), 1L, 1, 0, 20

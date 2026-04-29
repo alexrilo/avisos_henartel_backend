@@ -144,6 +144,77 @@ class AvisoTest {
 
             assertEquals("Descripción", aviso.descripcion());
         }
+
+        @Test
+        @DisplayName("should normalize materialesUsados to null when blank")
+        void shouldNormalizeMaterialesUsadosToNullWhenBlank() {
+            Aviso aviso = Aviso.reconstitute(
+                new AvisoId(1L),
+                1L,
+                CORRELATIVO,
+                "Descripción de prueba",
+                Prioridad.MEDIA,
+                EstadoAviso.NUEVO,
+                DIRECCION,
+                LocalDateTime.now(),
+                null,
+                null,
+                null,
+                null,
+                List.of(),
+                "   "
+            );
+
+            assertNull(aviso.materialesUsados());
+        }
+
+        @Test
+        @DisplayName("should trim materialesUsados")
+        void shouldTrimMaterialesUsados() {
+            Aviso aviso = Aviso.reconstitute(
+                new AvisoId(1L),
+                1L,
+                CORRELATIVO,
+                "Descripción de prueba",
+                Prioridad.MEDIA,
+                EstadoAviso.NUEVO,
+                DIRECCION,
+                LocalDateTime.now(),
+                null,
+                null,
+                null,
+                null,
+                List.of(),
+                "  Cableado y fusibles  "
+            );
+
+            assertEquals("Cableado y fusibles", aviso.materialesUsados());
+        }
+
+        @Test
+        @DisplayName("should reject materialesUsados longer than 1000 characters")
+        void shouldRejectMaterialesUsadosLongerThan1000Characters() {
+            String longValue = "A".repeat(1001);
+
+            assertThrows(DomainException.class, () ->
+                Aviso.reconstitute(
+                    new AvisoId(1L),
+                    1L,
+                    CORRELATIVO,
+                    "Descripción de prueba",
+                    Prioridad.MEDIA,
+                    EstadoAviso.NUEVO,
+                    DIRECCION,
+                    LocalDateTime.now(),
+                    null,
+                    null,
+                    null,
+                    null,
+                    List.of(),
+                    longValue
+                )
+            );
+        }
     }
 
     @Nested
@@ -207,6 +278,17 @@ class AvisoTest {
             assertEquals(EstadoAviso.COMPLETADO, aviso.estado());
             assertNotNull(aviso.fechaFin());
             assertTrue(aviso.isTerminal());
+        }
+
+        @Test
+        @DisplayName("completeWork should store materialesUsados when provided")
+        void completeWork_shouldStoreMaterialesUsados() {
+            Aviso aviso = createBasicAviso();
+            aviso.assignTecnico(2L, "admin");
+            aviso.startWork("tecnico");
+            aviso.completeWork("Cableado y conectores", "tecnico");
+
+            assertEquals("Cableado y conectores", aviso.materialesUsados());
         }
 
         @Test

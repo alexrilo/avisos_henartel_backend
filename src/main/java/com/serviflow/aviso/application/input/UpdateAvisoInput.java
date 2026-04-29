@@ -13,5 +13,6 @@ public record UpdateAvisoInput(
     String provincia,
     String codigoPostal,
     java.time.LocalDateTime fechaProgramada,
+    String materialesUsados,
     String usuario
 ) {}

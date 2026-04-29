@@ -49,7 +49,8 @@ public class AvisoMapper {
             entity.getTecnicoId(),
             entity.getFechaInicio(),
             entity.getFechaFin(),
-            observaciones
+            observaciones,
+            entity.getMaterialesUsados()
         );
     }
 
@@ -76,6 +77,7 @@ public class AvisoMapper {
         entity.setTecnicoId(aviso.tecnicoId());
         entity.setFechaInicio(aviso.fechaInicio());
         entity.setFechaFin(aviso.fechaFin());
+        entity.setMaterialesUsados(aviso.materialesUsados());
 
         // Map observaciones
         if (!aviso.observaciones().isEmpty()) {

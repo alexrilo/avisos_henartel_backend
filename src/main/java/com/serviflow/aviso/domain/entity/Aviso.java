@@ -32,14 +32,15 @@ public final class Aviso {
     private Long tecnicoId;
     private LocalDateTime fechaInicio;
     private LocalDateTime fechaFin;
+    private String materialesUsados;
     private final List<Observacion> observaciones;
 
     private Aviso(AvisoId id, Long clienteId, NumeroCorrelativo numeroCorrelativo,
                   String descripcion, Prioridad prioridad, EstadoAviso estado,
-                  DireccionServicio direccionServicio, LocalDateTime fechaCreacion,
-                  LocalDateTime fechaProgramada, Long tecnicoId,
-                  LocalDateTime fechaInicio, LocalDateTime fechaFin,
-                  List<Observacion> observaciones) {
+                   DireccionServicio direccionServicio, LocalDateTime fechaCreacion,
+                   LocalDateTime fechaProgramada, Long tecnicoId,
+                   LocalDateTime fechaInicio, LocalDateTime fechaFin,
+                   List<Observacion> observaciones, String materialesUsados) {
         this.id = id;
         this.clienteId = Objects.requireNonNull(clienteId, "ClienteId cannot be null");
         this.numeroCorrelativo = Objects.requireNonNull(numeroCorrelativo, "NumeroCorrelativo cannot be null");
@@ -52,6 +53,7 @@ public final class Aviso {
         this.tecnicoId = tecnicoId;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
+        this.materialesUsados = normalizeMaterialesUsados(materialesUsados);
         this.observaciones = observaciones != null ? new ArrayList<>(observaciones) : new ArrayList<>();
     }
 
@@ -63,9 +65,16 @@ public final class Aviso {
     public static Aviso create(Long clienteId, NumeroCorrelativo numeroCorrelativo,
                                 String descripcion, Prioridad prioridad,
                                 DireccionServicio direccionServicio, LocalDateTime fechaProgramada) {
+        return create(clienteId, numeroCorrelativo, descripcion, prioridad, direccionServicio, fechaProgramada, null);
+    }
+
+    public static Aviso create(Long clienteId, NumeroCorrelativo numeroCorrelativo,
+                                String descripcion, Prioridad prioridad,
+                                DireccionServicio direccionServicio, LocalDateTime fechaProgramada,
+                                String materialesUsados) {
         return new Aviso(null, clienteId, numeroCorrelativo, descripcion, prioridad,
                         EstadoAviso.NUEVO, direccionServicio, LocalDateTime.now(),
-                        fechaProgramada, null, null, null, new ArrayList<>());
+                        fechaProgramada, null, null, null, new ArrayList<>(), materialesUsados);
     }
 
     /**
@@ -77,9 +86,20 @@ public final class Aviso {
                                       LocalDateTime fechaProgramada, Long tecnicoId,
                                       LocalDateTime fechaInicio, LocalDateTime fechaFin,
                                       List<Observacion> observaciones) {
+        return reconstitute(id, clienteId, numeroCorrelativo, descripcion, prioridad, estado,
+                direccionServicio, fechaCreacion, fechaProgramada, tecnicoId, fechaInicio, fechaFin,
+                observaciones, null);
+    }
+
+    public static Aviso reconstitute(AvisoId id, Long clienteId, NumeroCorrelativo numeroCorrelativo,
+                                      String descripcion, Prioridad prioridad, EstadoAviso estado,
+                                      DireccionServicio direccionServicio, LocalDateTime fechaCreacion,
+                                      LocalDateTime fechaProgramada, Long tecnicoId,
+                                      LocalDateTime fechaInicio, LocalDateTime fechaFin,
+                                      List<Observacion> observaciones, String materialesUsados) {
         return new Aviso(id, clienteId, numeroCorrelativo, descripcion, prioridad, estado,
                         direccionServicio, fechaCreacion, fechaProgramada, tecnicoId,
-                        fechaInicio, fechaFin, observaciones);
+                        fechaInicio, fechaFin, observaciones, materialesUsados);
     }
 
     // ==================== Validation ====================
@@ -93,6 +113,20 @@ public final class Aviso {
             throw new DomainException("Descripcion cannot exceed 2000 characters");
         }
         return desc.trim();
+    }
+
+    private static String normalizeMaterialesUsados(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim();
+        if (normalized.isEmpty()) {
+            return null;
+        }
+        if (normalized.length() > 1000) {
+            throw new DomainException("MaterialesUsados cannot exceed 1000 characters");
+        }
+        return normalized;
     }
 
     // ==================== State Machine - Business Methods ====================
@@ -128,9 +162,14 @@ public final class Aviso {
      * Transition: EN_CURSO -> COMPLETADO
      */
     public void completeWork(String usuario) {
+        completeWork(null, usuario);
+    }
+
+    public void completeWork(String materialesUsados, String usuario) {
         if (!estado.canTransitionTo(EstadoAviso.COMPLETADO)) {
             throw new DomainException("Cannot complete from state: " + estado);
         }
+        this.materialesUsados = normalizeMaterialesUsados(materialesUsados);
         this.estado = EstadoAviso.COMPLETADO;
         this.fechaFin = LocalDateTime.now();
         addObservacion("Trabajo completado. Estado: EN_CURSO → COMPLETADO", "ESTADO_CHANGE", usuario);
@@ -201,13 +240,22 @@ public final class Aviso {
      * Returns a new immutable Aviso instance.
      */
     public Aviso updateInfo(String descripcion, Prioridad prioridad, DireccionServicio direccion, LocalDateTime fechaProgramada) {
+        return updateInfo(descripcion, prioridad, direccion, fechaProgramada, this.materialesUsados);
+    }
+
+    public Aviso updateInfo(String descripcion, Prioridad prioridad, DireccionServicio direccion, LocalDateTime fechaProgramada,
+                            String materialesUsados) {
         if (this.estado == EstadoAviso.EN_CURSO || this.estado == EstadoAviso.COMPLETADO || this.estado == EstadoAviso.CANCELADO) {
             throw new DomainException("Cannot update aviso in state: " + estado);
         }
         return new Aviso(this.id, this.clienteId, this.numeroCorrelativo,
             validateDescripcion(descripcion), prioridad, this.estado, direccion,
             this.fechaCreacion, fechaProgramada, this.tecnicoId, this.fechaInicio, this.fechaFin,
-            new ArrayList<>(this.observaciones));
+            new ArrayList<>(this.observaciones), materialesUsados);
+    }
+
+    public void updateMaterialesUsados(String materialesUsados) {
+        this.materialesUsados = normalizeMaterialesUsados(materialesUsados);
     }
 
     // ==================== Getters ====================
@@ -258,6 +306,10 @@ public final class Aviso {
 
     public LocalDateTime fechaFin() {
         return fechaFin;
+    }
+
+    public String materialesUsados() {
+        return materialesUsados;
     }
 
     public List<Observacion> observaciones() {

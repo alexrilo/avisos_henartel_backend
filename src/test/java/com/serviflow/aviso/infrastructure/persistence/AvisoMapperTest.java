@@ -76,7 +76,8 @@ class AvisoMapperTest {
             1L,
             null,
             null,
-            new ArrayList<>()
+            new ArrayList<>(),
+            "Destornilladores y cableado"
         );
 
         // Act
@@ -93,6 +94,7 @@ class AvisoMapperTest {
         assertThat(result.getNumero()).isEqualTo("456");
         assertThat(result.getLocalidad()).isEqualTo("Barcelona");
         assertThat(result.getTecnicoId()).isEqualTo(1L);
+        assertThat(result.getMaterialesUsados()).isEqualTo("Destornilladores y cableado");
     }
 
     @Test
@@ -115,7 +117,8 @@ class AvisoMapperTest {
             2L,
             LocalDateTime.of(2026, 3, 18, 8, 0),
             null,
-            new ArrayList<>()
+            new ArrayList<>(),
+            "Materiales de prueba"
         );
 
         // Act - domain to JPA and back
@@ -132,6 +135,7 @@ class AvisoMapperTest {
         assertThat(restored.tecnicoId()).isEqualTo(original.tecnicoId());
         assertThat(restored.direccionServicio().calle()).isEqualTo(original.direccionServicio().calle());
         assertThat(restored.direccionServicio().localidad()).isEqualTo(original.direccionServicio().localidad());
+        assertThat(restored.materialesUsados()).isEqualTo(original.materialesUsados());
     }
 
     @Test
@@ -181,5 +185,27 @@ class AvisoMapperTest {
 
         // Assert
         assertThat(result.id()).isNull();
+    }
+
+    @Test
+    void shouldMapMaterialsUsedFromJpaToDomain() {
+        JpaAvisoEntity entity = new JpaAvisoEntity();
+        entity.setId(1L);
+        entity.setClienteId(1L);
+        entity.setNumeroCorrelativo("AVI-2026-0001");
+        entity.setDescripcion("Test");
+        entity.setPrioridad("MEDIA");
+        entity.setEstado("NUEVO");
+        entity.setCalle("C");
+        entity.setNumero("1");
+        entity.setLocalidad("L");
+        entity.setProvincia("P");
+        entity.setCodigoPostal("12345");
+        entity.setFechaCreacion(LocalDateTime.now());
+        entity.setMaterialesUsados("Cinta aislante");
+
+        Aviso result = mapper.toDomain(entity);
+
+        assertThat(result.materialesUsados()).isEqualTo("Cinta aislante");
     }
 }

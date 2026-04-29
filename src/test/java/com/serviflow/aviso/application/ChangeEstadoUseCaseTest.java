@@ -54,14 +54,15 @@ class ChangeEstadoUseCaseTest {
             null,
             null,
             null,
-            java.util.List.of()
+            java.util.List.of(),
+            null
         );
     }
 
     @Test
     void execute_shouldTransitionNuevoToAsignado() {
         // Arrange
-        ChangeEstadoInput input = new ChangeEstadoInput(1L, "ASIGNADO", 1L, "test-user", null);
+        ChangeEstadoInput input = new ChangeEstadoInput(1L, "ASIGNADO", 1L, "test-user", null, null);
 
         when(avisoRepository.findById(new AvisoId(1L))).thenReturn(Optional.of(nuevoAviso));
         when(avisoRepository.save(any(Aviso.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -90,10 +91,11 @@ class ChangeEstadoUseCaseTest {
             1L,
             null,
             null,
-            java.util.List.of()
+            java.util.List.of(),
+            null
         );
 
-        ChangeEstadoInput input = new ChangeEstadoInput(1L, "EN_CURSO", null, "test-user", null);
+        ChangeEstadoInput input = new ChangeEstadoInput(1L, "EN_CURSO", null, "test-user", null, null);
 
         when(avisoRepository.findById(new AvisoId(1L))).thenReturn(Optional.of(asignadoAviso));
         when(avisoRepository.save(any(Aviso.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -122,10 +124,11 @@ class ChangeEstadoUseCaseTest {
             1L,
             LocalDateTime.now(),
             null,
-            java.util.List.of()
+            java.util.List.of(),
+            null
         );
 
-        ChangeEstadoInput input = new ChangeEstadoInput(1L, "COMPLETADO", null, "test-user", null);
+        ChangeEstadoInput input = new ChangeEstadoInput(1L, "COMPLETADO", null, "test-user", null, "Herramientas y repuestos varios");
 
         when(avisoRepository.findById(new AvisoId(1L))).thenReturn(Optional.of(enCursoAviso));
         when(avisoRepository.save(any(Aviso.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -135,12 +138,29 @@ class ChangeEstadoUseCaseTest {
 
         // Assert
         assertThat(result.estado()).isEqualTo("COMPLETADO");
+        assertThat(result.materialesUsados()).isEqualTo("Herramientas y repuestos varios");
+    }
+
+    @Test
+    void execute_shouldIgnoreMaterialesUsadosWhenNotCompleting() {
+        // Arrange
+        ChangeEstadoInput input = new ChangeEstadoInput(1L, "ASIGNADO", 1L, "test-user", null, "No debe guardarse");
+
+        when(avisoRepository.findById(new AvisoId(1L))).thenReturn(Optional.of(nuevoAviso));
+        when(avisoRepository.save(any(Aviso.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Act
+        AvisoOutput result = useCase.execute(input);
+
+        // Assert
+        assertThat(result.estado()).isEqualTo("ASIGNADO");
+        assertThat(result.materialesUsados()).isNull();
     }
 
     @Test
     void execute_shouldRejectInvalidTransition() {
         // Arrange - Cannot go directly from NUEVO to COMPLETADO
-        ChangeEstadoInput input = new ChangeEstadoInput(1L, "COMPLETADO", null, "test-user", null);
+        ChangeEstadoInput input = new ChangeEstadoInput(1L, "COMPLETADO", null, "test-user", null, null);
 
         when(avisoRepository.findById(new AvisoId(1L))).thenReturn(Optional.of(nuevoAviso));
 
@@ -166,10 +186,11 @@ class ChangeEstadoUseCaseTest {
             1L,
             LocalDateTime.now(),
             null,
-            java.util.List.of()
+            java.util.List.of(),
+            null
         );
 
-        ChangeEstadoInput input = new ChangeEstadoInput(1L, "PENDIENTE_SEGUIMIENTO", null, "test-user", null);
+        ChangeEstadoInput input = new ChangeEstadoInput(1L, "PENDIENTE_SEGUIMIENTO", null, "test-user", null, null);
 
         when(avisoRepository.findById(new AvisoId(1L))).thenReturn(Optional.of(enCursoAviso));
         when(avisoRepository.save(any(Aviso.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -184,7 +205,7 @@ class ChangeEstadoUseCaseTest {
     @Test
     void execute_shouldCancelAviso() {
         // Arrange
-        ChangeEstadoInput input = new ChangeEstadoInput(1L, "CANCELADO", null, "test-user", null);
+        ChangeEstadoInput input = new ChangeEstadoInput(1L, "CANCELADO", null, "test-user", null, null);
 
         when(avisoRepository.findById(new AvisoId(1L))).thenReturn(Optional.of(nuevoAviso));
         when(avisoRepository.save(any(Aviso.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -199,7 +220,7 @@ class ChangeEstadoUseCaseTest {
     @Test
     void execute_shouldThrowWhenAvisoNotFound() {
         // Arrange
-        ChangeEstadoInput input = new ChangeEstadoInput(999L, "ASIGNADO", 1L, "test-user", null);
+        ChangeEstadoInput input = new ChangeEstadoInput(999L, "ASIGNADO", 1L, "test-user", null, null);
 
         when(avisoRepository.findById(new AvisoId(999L))).thenReturn(Optional.empty());
 
